@@ -9,7 +9,9 @@
   },
   "author": "Guy A. Ross",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "axios": "^0.19.0"
+  },
   "devDependencies": {
     "@babel/cli": "^7.6.0",
     "@babel/core": "^7.6.0",
