@@ -1,5 +1,5 @@
 {
-  "name": "orva-sdk",
+  "name": "orva@skill-sdk",
   "version": "0.0.0",
   "description": "offical orva skills sdk. ",
   "main": "index.js",
