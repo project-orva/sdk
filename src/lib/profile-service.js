@@ -1,13 +1,52 @@
-import {Service} from '../.internal/service';
-import {Profile} from '../.internal/profile';
+const grpc = require('grpc');
+const protoloader = require('@grpc/proto-loader');
 
-const SERVICE_URL = 'http://example.service.com/';
+const PROTO_PATH = __dirname + '/../api/profile-guide.proto';
 
-const getUser = () => {
-  // handle grpc user request here.
-  return {};
+const generateClient = (serviceURL) => {
+  const protoDescriptor = grpc.loadPackageDefinition(protoloader.loadSync(
+      PROTO_PATH,
+      {keepCase: true,
+        longs: String,
+        enums: String,
+        defaults: true,
+        oneofs: true,
+      }
+  ));
+
+  const {grpcProfile: GrpcProfile} = protoDescriptor.grpcProfile;
+
+  return new GrpcProfile(
+      serviceURL,
+      grpc.credentials.createInsecure()
+  );
 };
 
-const service = new Service(SERVICE_URL, {get: getUser});
+/**
+ * ProfileService
+ * Provides an api to interact with the profile service.
+ */
+export default class ProfileService {
+  /**
+   * @param {string} url of the profile service
+   */
+  constructor(url) {
+    this._grpcClient = generateClient(url);
+  }
 
-export default new Profile(service);
+  /**
+   * getUser
+   * @param {String} id id of the user being queried
+   */
+  async getUser(id) {
+    return await new Promise((resolve, reject) => {
+      // type 1 : Account Type as User
+      client.FindProfileByAccountID({ID: id}, // eslint-disable-line new-cap
+          (err, res) => {
+            if (err) reject(err);
+            resolve(res);
+          });
+    });
+  }
+}
+
