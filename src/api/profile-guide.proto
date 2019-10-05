@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package grpcProfile;
+
+service grpcProfile {
+    rpc FindProfileByAccountID(ProfileRequest) returns(Profile) {}
+    rpc CreateProfile(Profile) returns(CreationResponse) {}
+}
+
+message CreationResponse {
+    bool Success = 1;
+}
+
+message ProfileRequest {
+    string ID = 1;
+}
+
+message Profile {
+    string BlockAddress = 1;
+    string AccountID = 2;
+    int32 CreatedOn = 3;    
+}
