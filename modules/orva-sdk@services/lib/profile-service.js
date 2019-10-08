@@ -40,7 +40,6 @@ export default class ProfileService {
    */
   async getUser(id) {
     return await new Promise((resolve, reject) => {
-      // type 1 : Account Type as User
       client.FindProfileByAccountID({ID: id}, // eslint-disable-line new-cap
           (err, res) => {
             if (err) reject(err);
