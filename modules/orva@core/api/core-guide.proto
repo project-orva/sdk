@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+service grpcCore {
+    rpc processStatement(Request) returns(Response) {}
+}
+
+message Request {
+    string Message = 1;
+    string UserID  = 2;
+    string DeviceID   = 3;
+}
+
+message Response {
+    int32 Duration = 1; // miliseconds
+    string Message = 2; 
+
+    int32 GphType = 3; // video, picture & audio.
+    string Gph = 4;
+}
