@@ -1,13 +1,13 @@
 import pos from 'pos';
 
-const createdTagged = (text) => {
+export const createTagged = (text) => {
   const words = new pos.Lexer().lex(text);
   const tagger = new pos.Tagger();
   return tagger.tag(words);
 };
 
 export const consolidateTags = (text) => {
-  const tagged = createdTagged(text);
+  const tagged = createTagged(text);
 
   const tags = {};
   for (const i in tagged) {
@@ -45,7 +45,7 @@ export const consolidateTags = (text) => {
 export const extractUniquePOS = (text) => {
   const ommited = ['CD'];
 
-  const tagged = createdTagged(text);
+  const tagged = createTagged(text);
 
   const uniqueText = [];
   for (const i in tagged) {
@@ -64,7 +64,7 @@ export const extractUniquePOS = (text) => {
 };
 
 export const createPOSOrderedListFromTags = (text) => {
-  const tagged = createdTagged(text);
+  const tagged = createTagged(text);
 
   const ol = [];
   for (const i in tagged) {
