@@ -20,7 +20,7 @@ const handleReq = (req) => {
   });
 };
 
-const HTTPServer = (port, skillHandler) => {
+const HTTPServer = async (port, skillHandler) => {
   http.createServer(async (req, res) => {
     if (req.method !== 'POST') {
       res.writeHead(405);
@@ -50,7 +50,7 @@ const HTTPServer = (port, skillHandler) => {
       res.end();
     };
 
-    const skillResponse = skillHandler(resp, handleErr);
+    const skillResponse = await skillHandler(resp, handleErr);
 
     res.writeHead(200, {'Content-Type': 'application/json'});
     res.write(JSON.stringify(skillResponse));
