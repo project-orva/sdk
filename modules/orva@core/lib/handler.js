@@ -12,18 +12,16 @@ const compareConsolidation = (first, second) => {
       return;
     }
     const dist = first[key] - second[key]; // best case -> 0
-    score += 100 >> Math.abs(dist);
-    // console.log(score);
+    score += 80 >> Math.abs(dist);
   });
 
   return score;
 };
 
+// TODO: synomizer.
+
 const compareUnique = (first, second) => {
   let score = 0;
-
-  // console.log(first, second);
-
   first.forEach((unique, fidx) => {
     if (second.includes(unique)) {
       score += 100 >> Math.abs(fidx - second.indexOf(unique));
@@ -74,12 +72,17 @@ export class SkillHandler {
             scores.push(c2Score + c1Score);
           });
 
-          return {score: scores.reduce((a, c) => a + c) / scores.length, handlerCB};
+          return {score: scores.sort((f, s) => s-f)[0], handlerCB};
+          // return {score: scores.reduce((a, c) => a + c) / scores.length, handlerCB};
         });
+
+    console.log(rankedOperations);
 
     const bestOperation = rankedOperations.sort((first, second) => {
       return second.score - first.score;
     })[0];
+
+    console.log('best op', bestOperation);
 
     return bestOperation.handlerCB(request, errHandler);
   }
