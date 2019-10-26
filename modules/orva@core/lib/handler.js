@@ -76,13 +76,9 @@ export class SkillHandler {
           // return {score: scores.reduce((a, c) => a + c) / scores.length, handlerCB};
         });
 
-    console.log(rankedOperations);
-
     const bestOperation = rankedOperations.sort((first, second) => {
       return second.score - first.score;
     })[0];
-
-    console.log('best op', bestOperation);
 
     return bestOperation.handlerCB(request, errHandler);
   }
