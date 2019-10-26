@@ -1,4 +1,37 @@
 import HTTPServer from '../internal/web-server';
+import {consolidateTags, extractUniquePOS} from '../internal/pos';
+
+// comparseConsolidation
+// compare the amount of tag values within each dictionary.
+const compareConsolidation = (first, second) => {
+  const firstKeys = Object.keys(first);
+
+  let score = 0;
+  firstKeys.forEach((key) => {
+    if (!(key in second)) {
+      return;
+    }
+    const dist = first[key] - second[key]; // best case -> 0
+    score += 100 >> Math.abs(dist);
+    // console.log(score);
+  });
+
+  return score;
+};
+
+const compareUnique = (first, second) => {
+  let score = 0;
+
+  // console.log(first, second);
+
+  first.forEach((unique, fidx) => {
+    if (second.includes(unique)) {
+      score += 100 >> Math.abs(fidx - second.indexOf(unique));
+    }
+  });
+
+  return score;
+};
 
 /**
  * SkillHandler
@@ -8,6 +41,7 @@ export class SkillHandler {
   /**
      * constructor
      * @param {*} server
+     * @param {*} determinationMethod
      */
   constructor(server = HTTPServer) {
     this.skills = [];
@@ -22,7 +56,32 @@ export class SkillHandler {
    * @return {Object} the response from the found operation
    */
   _determineSkill(request, errHandler) {
-    return this.skills[0].handlerCB(request, errHandler);
+    // generate a score from each
+    // return handler with highest score
+    const rankedOperations = this.skills
+        .map(({examples, handlerCB}) => {
+          const scores = [];
+          examples.forEach((example) => {
+            const c1Score = compareConsolidation(
+                consolidateTags(request.Message),
+                example.consilatedTags
+            );
+            const c2Score = compareUnique(
+                extractUniquePOS(request.Message),
+                example.unique
+            );
+
+            scores.push(c2Score + c1Score);
+          });
+
+          return {score: scores.reduce((a, c) => a + c) / scores.length, handlerCB};
+        });
+
+    const bestOperation = rankedOperations.sort((first, second) => {
+      return second.score - first.score;
+    })[0];
+
+    return bestOperation.handlerCB(request, errHandler);
   }
 
   /**
@@ -30,8 +89,8 @@ export class SkillHandler {
    * starts the skill handler server
    * @param {*} port
    */
-  start(port) {
-    this.server(port, (...args) => this._determineSkill(...args));
+  async start(port) {
+    this.server(port, async (...args) => this._determineSkill(...args));
   }
 
   /**
@@ -40,8 +99,17 @@ export class SkillHandler {
    * @param {*} examples
    * @param {*} handlerCB
    */
-  handleSkill(examples, handlerCB) {
-    this.skills.push({examples, handlerCB});
+  async handleSkill(examples, handlerCB) {
+    const updatedExamples = examples.map((example) => ({
+      exampleText: example,
+      consilatedTags: consolidateTags(example),
+      unique: extractUniquePOS(example),
+    }));
+
+    this.skills.push({
+      examples: updatedExamples,
+      handlerCB,
+    });
   }
 }
 
