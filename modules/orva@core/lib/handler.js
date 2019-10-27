@@ -31,6 +31,14 @@ const compareUnique = (first, second) => {
   return score;
 };
 
+const defaultResponse = {
+  Statement: '',
+  AssignedFrom: '',
+  GraphicURL: '',
+  GraphicType: '',
+  Error: '',
+};
+
 /**
  * SkillHandler
  * handles the skill service management
@@ -72,15 +80,31 @@ export class SkillHandler {
             scores.push(c2Score + c1Score);
           });
 
-          return {score: scores.sort((f, s) => s-f)[0], handlerCB};
-          // return {score: scores.reduce((a, c) => a + c) / scores.length, handlerCB};
+          return {score: scores.sort((f, s) => s - f)[0], handlerCB};
         });
 
     const bestOperation = rankedOperations.sort((first, second) => {
       return second.score - first.score;
     })[0];
 
-    return bestOperation.handlerCB(request, errHandler);
+    try {
+      const handlerResponse = bestOperation.handlerCB(request, errHandler);
+      if (typeof handlerResponse === 'string') {
+        return {
+          ...defaultResponse,
+          Statement: handlerResponse,
+        };
+      }
+      return {
+        ...defaultResponse,
+        ...handlerResponse,
+      };
+    } catch (err) {
+      return {
+        ...defaultResponse,
+        Error: err.message,
+      };
+    }
   }
 
   /**
@@ -111,6 +135,5 @@ export class SkillHandler {
     });
   }
 }
-
 
 export default new SkillHandler();
