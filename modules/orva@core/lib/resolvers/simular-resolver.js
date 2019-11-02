@@ -1,4 +1,7 @@
-import {determineFuncationalLabel} from '../../internal/helpers';
+import {
+  determineFuncationalLabel,
+  calcConfidence,
+} from '../../internal/helpers';
 
 export default async (dictionaryApi, {
   words: exampleWords,
@@ -6,7 +9,7 @@ export default async (dictionaryApi, {
 }, {
     words: messageWords,
   }) => {
-  let score = 0;
+  const scores = [];
 
   for (let idx = 0; idx < exampleWords.length; idx++) {
     const unique = exampleWords[idx];
@@ -21,15 +24,14 @@ export default async (dictionaryApi, {
       continue;
     }
 
-    console.log(topFL.meta.syns[0]);
-
     topFL.meta.syns[0].forEach((syn) => {
       if (messageWords.includes(syn)) {
-        score += 90;
+        scores.push(90);
+      } else {
+        scores.push(0);
       }
     });
   }
 
-  return score;
-}
-;
+  return calcConfidence(scores);
+};
