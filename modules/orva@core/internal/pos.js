@@ -6,48 +6,12 @@ export const createTagged = (text) => {
   return tagger.tag(words);
 };
 
-export const consolidateTags = (text) => {
-  const tagged = createTagged(text);
-
-  const tags = {};
-  for (const i in tagged) {
-    if (Object.prototype.hasOwnProperty.call(tagged, i)) {
-      const taggedWord = tagged[i];
-      const tag = taggedWord[1];
-
-      if (typeof tags[tag] === 'undefined') {
-        tags[tag] = 0;
-      }
-
-      tags[tag] += 1;
-    }
-  }
-
-  return tags;
-};
-
-/*
-    PosType.WTF_TWO,
-    PosType.VBP,
-    PosType.WTF,
-    PosType.DT,
-    PosType.RB,
-    PosType.IN,
-    PosType.VBZ,
-    PosType.TO,
-    PosType.CC,
-    PosType.VB,
-    PosType.PRP,
-    PosType.MD,
-    PosType.VBD,
-    PosType.PRPS
-*/
-export const extractUniquePOS = (text) => {
-  const ommited = ['CD'];
+export const createPOSMapping = (text) => {
+  const ommited = ['CD', 'VBZ', 'PRP$'];
 
   const tagged = createTagged(text);
 
-  const uniqueText = [];
+  const uniquePOS = [];
   for (const i in tagged) {
     if (Object.prototype.hasOwnProperty.call(tagged, i)) {
       const taggedWord = tagged[i];
@@ -55,26 +19,11 @@ export const extractUniquePOS = (text) => {
       const tag = taggedWord[1];
 
       if (!ommited.includes(tag)) {
-        uniqueText.push(word);
+        uniquePOS.push({word, tag});
       }
     }
   }
 
-  return uniqueText;
-};
-
-export const createPOSOrderedListFromTags = (text) => {
-  const tagged = createTagged(text);
-
-  const ol = [];
-  for (const i in tagged) {
-    if (Object.prototype.hasOwnProperty.call(tagged, i)) {
-      const taggedWord = tagged[i];
-      const tag = taggedWord[1];
-
-      ol.push(tag);
-    }
-  }
-
-  return ol;
-};
+  return uniquePOS;
+}
+;
