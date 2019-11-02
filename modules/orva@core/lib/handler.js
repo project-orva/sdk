@@ -1,8 +1,7 @@
-import HTTPServer from '../internal/web-server';
 import {createPOSMapping} from '../internal/pos';
 
+import HTTPServer from './web-server';
 import ConsolidationResolver from '../lib/resolvers/consolidation-resolver';
-import SimularResolver from '../lib/resolvers/simular-resolver';
 import UniqueResolver from '../lib/resolvers/unique-resolver';
 
 import {
