@@ -1,35 +1,16 @@
 import HTTPServer from '../internal/web-server';
-import {consolidateTags, extractUniquePOS} from '../internal/pos';
+import {createPOSMapping} from '../internal/pos';
 
-// comparseConsolidation
-// compare the amount of tag values within each dictionary.
-const compareConsolidation = (first, second) => {
-  const firstKeys = Object.keys(first);
+import ConsolidationResolver from '../lib/resolvers/consolidation-resolver';
+import SimularResolver from '../lib/resolvers/simular-resolver';
+import UniqueResolver from '../lib/resolvers/unique-resolver';
 
-  let score = 0;
-  firstKeys.forEach((key) => {
-    if (!(key in second)) {
-      return;
-    }
-    const dist = first[key] - second[key]; // best case -> 0
-    score += 80 >> Math.abs(dist);
-  });
-
-  return score;
-};
-
-// TODO: synomizer.
-
-const compareUnique = (first, second) => {
-  let score = 0;
-  first.forEach((unique, fidx) => {
-    if (second.includes(unique)) {
-      score += 100 >> Math.abs(fidx - second.indexOf(unique));
-    }
-  });
-
-  return score;
-};
+import {
+  shrinkMapping,
+  getAverage,
+  selectHighestRankedOperation,
+  scoreResolvers,
+} from '../internal/helpers';
 
 const defaultResponse = {
   Statement: '',
@@ -39,6 +20,11 @@ const defaultResponse = {
   Error: '',
 };
 
+const defaultResovlers = [
+  ConsolidationResolver,
+  UniqueResolver,
+];
+
 /**
  * SkillHandler
  * handles the skill service management
@@ -47,11 +33,12 @@ export class SkillHandler {
   /**
      * constructor
      * @param {*} server
-     * @param {*} determinationMethod
+     * @param {*} resolvers
      */
-  constructor(server = HTTPServer) {
+  constructor(server = HTTPServer, resolvers = defaultResovlers) {
     this.skills = [];
     this.server = server;
+    this.resolvers = resolvers;
   }
 
   /**
@@ -61,42 +48,42 @@ export class SkillHandler {
    * @param {*} errHandler
    * @return {Object} the response from the found operation
    */
-  _determineSkill(request, errHandler) {
-    // generate a score from each
-    // return handler with highest score
-    const rankedOperations = this.skills
-        .map(({examples, handlerCB}) => {
-          const scores = [];
-          examples.forEach((example) => {
-            const c1Score = compareConsolidation(
-                consolidateTags(request.Message),
-                example.consilatedTags
-            );
-            const c2Score = compareUnique(
-                extractUniquePOS(request.Message),
-                example.unique
-            );
-
-            scores.push(c2Score + c1Score);
-          });
-
-          return {score: scores.sort((f, s) => s - f)[0], handlerCB};
-        });
-
-    const bestOperation = rankedOperations.sort((first, second) => {
-      return second.score - first.score;
-    })[0];
+  async _determineSkill(request, errHandler) {
+    const requestMapping = shrinkMapping(
+        createPOSMapping(request.Message)
+    );
 
     try {
-      const handlerResponse = bestOperation.handlerCB(request, errHandler);
+      const rankedOperations = await Promise.all(this.skills
+          .map(async ({examples, handlerCB}) => {
+            const scores = [];
+
+            for (let idx = 0; idx < examples.length; idx++) {
+              const score = await scoreResolvers(this.resolvers, {
+                exampleMapping: examples[idx].posMapping,
+                requestMapping,
+              });
+
+              scores.push(score);
+            }
+
+            return {score: getAverage(scores), handlerCB};
+          }));
+
+      const bestOperation = await selectHighestRankedOperation(rankedOperations);
+
+      const handlerResponse = await bestOperation.handlerCB(request, errHandler);
+
       if (typeof handlerResponse === 'string') {
         return {
           ...defaultResponse,
+          Score: JSON.stringify(await bestOperation.score),
           Statement: handlerResponse,
         };
       }
       return {
         ...defaultResponse,
+        TypeOf: typeof handlerResponse,
         ...handlerResponse,
       };
     } catch (err) {
@@ -125,8 +112,9 @@ export class SkillHandler {
   async handleSkill(examples, handlerCB) {
     const updatedExamples = examples.map((example) => ({
       exampleText: example,
-      consilatedTags: consolidateTags(example),
-      unique: extractUniquePOS(example),
+      posMapping: shrinkMapping(
+          createPOSMapping(example)
+      ),
     }));
 
     this.skills.push({
