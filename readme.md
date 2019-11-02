@@ -3,7 +3,7 @@ This package set provides modules for developing skills and service devices regi
 
 ## Running
 ### Tests
-`npm test`: tests are built with jest.
+`npm test` tests are written with jest.
 
 ## Usage
 
@@ -12,7 +12,7 @@ This package set provides modules for developing skills and service devices regi
 The core module provides support for creating/ registering a skill with orva.
 
 __Basic__:
-Visit [For Advanced Usage]('./modules/orva@core')
+Visit [For Advanced Usage]('/modules/orva@core/readme.md')
 
 #### Services
 
