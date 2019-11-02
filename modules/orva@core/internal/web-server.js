@@ -33,9 +33,9 @@ const HTTPServer = async (port, skillHandler) => {
         .catch((err) => ({resp: undefined, err}) );
 
     if (err) {
-      const adjustedErr = {Error: `${err}`};
+      const adjustedErr = {Error: err.message};
 
-      res.writeHead(200, {'Content-Type': 'application/json'});
+      res.writeHead(500, {'Content-Type': 'application/json'});
       res.write(JSON.stringify(adjustedErr));
       res.end();
 
@@ -43,9 +43,9 @@ const HTTPServer = async (port, skillHandler) => {
     }
 
     const handleErr = (handlerErr) => {
-      const adjustedErr = {Error: `${handlerErr}`};
+      const adjustedErr = {Error: handlerErr.message};
 
-      res.writeHead(200, {'Content-Type': 'application/json'});
+      res.writeHead(500, {'Content-Type': 'application/json'});
       res.write(JSON.stringify(adjustedErr));
       res.end();
     };
