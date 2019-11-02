@@ -1,3 +1,5 @@
+import {calcConfidence} from '../../internal/helpers';
+
 const consolidateTags = (tagged) => {
   const tags = {};
   for (const i in tagged) {
@@ -16,21 +18,23 @@ const consolidateTags = (tagged) => {
   return tags;
 }; // dis should go in a helper.
 
+const MAX_SCORE = 80;
+
 export default ({tags: exampleTags}, {tags: messageTags}) => {
   const conExampleTags = consolidateTags(exampleTags);
   const conMessageTags = consolidateTags(messageTags);
 
   const exampleKeys = Object.keys(conExampleTags);
 
-  let score = 0;
+  const scores = [];
   exampleKeys.forEach((key) => {
     if (!(key in conMessageTags)) {
       return;
     }
     const dist = conExampleTags[key] - conMessageTags[key]; // best case -> 0
-    score += 80 >> Math.abs(dist);
+    scores.push(MAX_SCORE >> Math.abs(dist));
   });
 
-  return score; // todo: score + confidence
+  return calcConfidence(scores);
 };
 
