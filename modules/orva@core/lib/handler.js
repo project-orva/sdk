@@ -57,21 +57,34 @@ export class SkillHandler {
           .map(async ({examples, handlerCB}) => {
             const scores = [];
 
+            // calculate score for each of the examples
             for (let idx = 0; idx < examples.length; idx++) {
               const score = await scoreResolvers(this.resolvers, {
                 exampleMapping: examples[idx].posMapping,
                 requestMapping,
               });
 
-              scores.push(score);
+              scores.push(...score);
             }
 
-            return {score: getAverage(scores), handlerCB};
+            return {
+              score: getAverage(scores.map((x) => x.sum)),
+              confidence: getAverage(scores.map((x) => x.confidence)),
+              handlerCB,
+            };
           }));
 
-      const bestOperation = await selectHighestRankedOperation(rankedOperations);
+      // determine which of the examples best fit the input message
+      // then use the handler that belongs to that set of examples
 
-      const handlerResponse = await bestOperation.handlerCB(request, errHandler);
+      const bestOperation = await selectHighestRankedOperation(
+          rankedOperations
+      );
+
+      const handlerResponse = await bestOperation.handlerCB(
+          request,
+          errHandler
+      );
 
       if (typeof handlerResponse === 'string') {
         return {
@@ -86,6 +99,7 @@ export class SkillHandler {
         ...handlerResponse,
       };
     } catch (err) {
+      throw err;
       return {
         ...defaultResponse,
         Error: err.message,

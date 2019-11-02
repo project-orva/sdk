@@ -4,12 +4,8 @@ export default async (
     exampleMapping,
     requestMapping,
   }
-) => {
-  const resolverResp = await Promise.all(resolvers
-      .map(async (resolver) => await resolver(
-          exampleMapping,
-          requestMapping),
-      ));
-
-  return await resolverResp.reduce((a, c) => c + a);
-};
+) => await Promise.all(resolvers
+    .map(async (resolver) => await resolver(
+        exampleMapping,
+        requestMapping),
+    ));
