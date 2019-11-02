@@ -1,8 +1,26 @@
 ## Orva SDK
-Sdk used to make skills registered with the orva core services. __Still WIP__
+This package set provides modules for developing skills and service devices registed with orva.
 
 ## Running
 ### Tests
 `npm test`: tests are built with jest.
+
+## Usage
+
+### Modules
+#### Core
+The core module provides support for creating/ registering a skill with orva.
+
+__Basic__:
+Visit [For Advanced Usage]('./modules/orva@core')
+
+#### Services
+
+#### Utilities
+
+
+
+
+
 
 
