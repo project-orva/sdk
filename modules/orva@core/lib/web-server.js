@@ -20,7 +20,7 @@ const handleReq = (req) => {
   });
 };
 
-const HTTPServer = async (port, skillHandler) => {
+const HTTPServer = async (port, handler) => {
   http.createServer(async (req, res) => {
     if (req.method !== 'POST') {
       res.writeHead(405);
@@ -28,6 +28,7 @@ const HTTPServer = async (port, skillHandler) => {
 
       return;
     }
+
     const {resp, err} = await handleReq(req)
         .then((resp) => ({resp, err: undefined}) )
         .catch((err) => ({resp: undefined, err}) );
@@ -50,7 +51,7 @@ const HTTPServer = async (port, skillHandler) => {
       res.end();
     };
 
-    const skillResponse = await skillHandler(resp, handleErr);
+    const skillResponse = await handler(resp, handleErr, req);
 
     res.writeHead(200, {'Content-Type': 'application/json'});
     res.write(JSON.stringify(skillResponse));

@@ -1,8 +1,9 @@
 import {createPOSMapping} from '../internal/pos';
 
 import HTTPServer from './web-server';
-import ConsolidationResolver from '../lib/resolvers/consolidation-resolver';
-import UniqueResolver from '../lib/resolvers/unique-resolver';
+import ConsolidationResolver from './resolvers/consolidation-resolver';
+import UniqueResolver from './resolvers/unique-resolver';
+import SimularResolver from './resolvers/simular-resolver';
 
 import {
   shrinkMapping,
@@ -22,6 +23,7 @@ const defaultResponse = {
 const defaultResovlers = [
   ConsolidationResolver,
   UniqueResolver,
+  SimularResolver,
 ];
 
 /**
@@ -63,7 +65,6 @@ export class SkillHandler {
                 exampleMapping: examples[idx].posMapping,
                 requestMapping,
               });
-
               scores.push(...score);
             }
 
@@ -76,7 +77,6 @@ export class SkillHandler {
 
       // determine which of the examples best fit the input message
       // then use the handler that belongs to that set of examples
-
       const bestOperation = await selectHighestRankedOperation(
           rankedOperations
       );
@@ -86,11 +86,14 @@ export class SkillHandler {
           errHandler
       );
 
+      const {score, confidence} = await bestOperation;
+
       if (typeof handlerResponse === 'string') {
         return {
           ...defaultResponse,
-          Score: JSON.stringify(await bestOperation.score),
+          Score: score,
           Statement: handlerResponse,
+          Confidence: confidence,
         };
       }
       return {
