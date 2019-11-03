@@ -3,6 +3,8 @@ import {
   calcConfidence,
 } from '../../internal/helpers';
 
+const MAX_SCORE = 90;
+
 export default async (dictionaryApi, {
   words: exampleWords,
   tags: exampleTags,
@@ -26,7 +28,7 @@ export default async (dictionaryApi, {
 
     topFL.meta.syns[0].forEach((syn) => {
       if (messageWords.includes(syn)) {
-        scores.push(90);
+        scores.push(MAX_SCORE);
       } else {
         scores.push(0);
       }

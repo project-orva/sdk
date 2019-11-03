@@ -35,6 +35,6 @@ export default ({tags: exampleTags}, {tags: messageTags}) => {
     scores.push(MAX_SCORE >> Math.abs(dist));
   });
 
-  return calcConfidence(scores);
+  return calcConfidence(scores, MAX_SCORE);
 };
 
