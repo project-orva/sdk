@@ -25,7 +25,7 @@ To register a skill operation within the skill, first provide examples of sample
 More examples = higher confidence.
 
 ```js
-import Skill from 'orva@core';
+import Skill from '@orva-sdk/core';
 
 const exampleMessages = ['who am i', 'what is my id'];
 Skill.handleSkill(exampleMessages, (req, err) => {
@@ -52,7 +52,7 @@ __Visit services readme for advanced usage__
 ##### Core Basic Usage
 
 ```js
-import { CoreHandler } from 'orva@services';
+import { CoreHandler } from '@orva-sdk/services';
 
 // ...
 
@@ -80,7 +80,7 @@ Output
 ```
 ##### Profile Basic Usage
 ```js
-import { ProfileService } from 'orva@services';
+import { ProfileService } from '@orva-sdk/services';
 
 //...
 
@@ -110,7 +110,7 @@ Basic utilities for designing skills.
 The store provides a basic store for persisting user state throughout sessions.
 
 ```js
-import { store } from 'orva@utilities';
+import { store } from '@orva-sdk/utilities';
 
 //...
 const user = 'userid';
