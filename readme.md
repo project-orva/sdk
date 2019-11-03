@@ -13,11 +13,11 @@ This package set provides modules for developing skills and service devices regi
 
 ## Documentation
 
-### Modules
-#### Core
+## Modules
+### Core
 The core module provides support for creating/ registering a skill with orva.
 
-##### Basic Usage:
+#### Basic Usage:
 __Visit the core readme for advanced usage__
 
 To register a skill operation within the skill, first provide examples of sample text be compared with when choosing what operation to be ran. 
@@ -41,15 +41,15 @@ Skill.start(port);
 
 ```
 
-#### Services
+### Services
 Services module is used to interact with orva core services.
 __Visit services readme for advanced usage__
 
-##### Supported Services
+#### Supported Services
 - Core Service
 - Profile Service
 
-##### Core Basic Usage
+#### Core Basic Usage
 
 ```js
 import { CoreHandler } from '@orva-sdk/services';
@@ -78,7 +78,7 @@ Output
 ]
 */
 ```
-##### Profile Basic Usage
+#### Profile Basic Usage
 ```js
 import { ProfileService } from '@orva-sdk/services';
 
@@ -101,12 +101,12 @@ const user = await profileService.getUser(userID);
 
 ```
 
-#### Utilities
+### Utilities
 Basic utilities for designing skills.
 
 - Store
 
-##### Store Basic Usage
+#### Store Basic Usage
 The store provides a basic store for persisting user state throughout sessions.
 
 ```js
