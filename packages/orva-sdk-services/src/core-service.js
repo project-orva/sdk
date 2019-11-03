@@ -1,6 +1,6 @@
-import {generateGRPCClient} from '../internal';
+import {generateGRPCClient} from './helpers';
 
-const PROTO_PATH = __dirname + '/../api/core-guide.proto';
+const PROTO_PATH = __dirname + '/api/core-guide.proto';
 
 /**
  * CoreHandler
