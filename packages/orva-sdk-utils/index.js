@@ -1,1 +1,1 @@
-export {store} from './src/lib';
+export {store} from './src';
