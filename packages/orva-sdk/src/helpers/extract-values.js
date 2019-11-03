@@ -1,4 +1,4 @@
-import {createTagged} from '../../internal/pos';
+import {createTagged} from '../internal/pos';
 
 export const extractValues = (req) => {
   const tagged = createTagged(req.Message);

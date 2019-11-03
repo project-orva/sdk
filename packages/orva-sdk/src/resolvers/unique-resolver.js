@@ -1,4 +1,4 @@
-import {calcConfidence} from '../../internal/helpers';
+import {calcConfidence} from '../internal/helpers';
 
 const MAX_SCORE = 100;
 

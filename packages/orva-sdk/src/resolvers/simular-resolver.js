@@ -1,7 +1,7 @@
 import {
   determineFuncationalLabel,
   calcConfidence,
-} from '../../internal/helpers';
+} from '../internal/helpers';
 
 const MAX_SCORE = 90;
 
