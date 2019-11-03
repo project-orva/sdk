@@ -29,10 +29,12 @@ export default class CoreHandler {
     };
 
     return await new Promise((resolve, reject) => {
-      this._grpcClient.ProcessStatement(r, (err, res) => { // eslint-disable-line new-cap
-        if (err) reject(err);
-        resolve(res);
-      });
+      this._grpcClient['ProcessStatement'](// eslint-disable-line new-cap
+          r,
+          (err, res) => {
+            if (err) reject(err);
+            resolve(res);
+          });
     });
   }
 }

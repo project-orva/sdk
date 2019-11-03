@@ -20,11 +20,13 @@ export default class ProfileService {
    */
   async getUser(id) {
     return await new Promise((resolve, reject) => {
-      this._grpcClient.FindProfileByAccountID({ID: id}, // eslint-disable-line new-cap
-          (err, res) => {
-            if (err) reject(err);
-            resolve(res);
-          });
+      this._grpcClient['FindProfileByAccountID']({// eslint-disable-line new-cap
+        ID: id,
+      },
+      (err, res) => {
+        if (err) reject(err);
+        resolve(res);
+      });
     });
   }
 }
