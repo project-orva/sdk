@@ -1,6 +1,6 @@
 <p align="center">
   <a href="" rel="noopener">
- <img src="https://avatars2.githubusercontent.com/u/53947571?s=400&v=4"  alt="Icebox Logo"></a>
+ <img src="https://avatars2.githubusercontent.com/u/53947571?s=200&v=4"  alt="Icebox Logo"></a>
 </p>
 
 <h1 align="center">Orva SDK</h1>
