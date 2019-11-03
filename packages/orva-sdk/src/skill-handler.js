@@ -1,4 +1,4 @@
-import {createPOSMapping} from '../internal/pos';
+import {createPOSMapping} from './internal/pos';
 
 import HTTPServer from './web-server';
 import ConsolidationResolver from './resolvers/consolidation-resolver';
@@ -10,7 +10,7 @@ import {
   getAverage,
   selectHighestRankedOperation,
   scoreResolvers,
-} from '../internal/helpers';
+} from './internal/helpers';
 
 const defaultResponse = {
   Statement: '',

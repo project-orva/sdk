@@ -1,4 +1,4 @@
-import {generateGRPCClient} from './helpers';
+import {generateGRPCClient} from './internal';
 
 const PROTO_PATH = __dirname + '/api/core-guide.proto';
 
