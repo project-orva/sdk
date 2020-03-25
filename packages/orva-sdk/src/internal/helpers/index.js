@@ -6,3 +6,4 @@ export {
 } from './select-highest-ranked-operation';
 export {default as scoreResolvers} from './score-resolvers';
 export {default as calcConfidence} from './calc-confidence';
+export {default as consolidateTags} from './consolidate-tags';
