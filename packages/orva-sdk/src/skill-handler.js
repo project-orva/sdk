@@ -3,7 +3,7 @@ import {createPOSMapping} from './internal/pos';
 import HTTPServer from './web-server';
 import ConsolidationResolver from './resolvers/consolidation-resolver';
 import UniqueResolver from './resolvers/unique-resolver';
-import SimularResolver from './resolvers/simular-resolver';
+import SimilarResolver from './resolvers/similar-resolver';
 
 import {
   shrinkMapping,
@@ -23,7 +23,7 @@ const defaultResponse = {
 const defaultResovlers = [
   ConsolidationResolver,
   UniqueResolver,
-  SimularResolver,
+  SimilarResolver,
 ];
 
 /**
