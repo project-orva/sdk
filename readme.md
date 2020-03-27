@@ -27,8 +27,14 @@ More examples = higher confidence.
 ```js
 import Skill from '@orva-sdk/core';
 
+const app = new Skill({
+    // required params
+    skillHostURL: "localhost:3024", 
+    skillID: 'test1234'
+})
+
 const exampleMessages = ['who am i', 'what is my id'];
-Skill.handleSkill(exampleMessages, (req, err) => {
+app.handleSkill(exampleMessages, (req, err) => {
     if(!req.UserID) {
         err('Cannot find UserID');
     }
@@ -36,8 +42,7 @@ Skill.handleSkill(exampleMessages, (req, err) => {
     return req.UserID;
 })
 
-const port = 3000;
-Skill.start(port);
+app.start(3000, () => console.log('App started on port 3000'));
 
 ```
 
