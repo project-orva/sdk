@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package grpcSkill;
+
+service grpcSkill {
+    rpc RegisterCurrentInstance(RegisterRequest) returns(RegisterResponse) {}
+}
+
+message PosMappingInfo {
+    repeated string Words = 1;
+    repeated string Tags = 2;
+}
+
+message SkillInfo {
+    string ExampleText = 1;
+    PosMappingInfo POSMapping = 2;
+}
+
+message RegisterRequest {
+    repeated SkillInfo ExampleInfo = 1; 
+    string SkillID = 2;
+}
+
+message RegisterResponse {
+    bool IsRegistered = 1;
+}
