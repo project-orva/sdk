@@ -3,22 +3,20 @@ syntax = "proto3";
 package grpcSkill;
 
 service grpcSkill {
-    rpc RegisterCurrentInstance(RegisterRequest) returns(RegisterResponse) {}
-}
-
-message PosMappingInfo {
-    repeated string Words = 1;
-    repeated string Tags = 2;
+    rpc RegisterSkill(RegisterRequest) returns(RegisterResponse) {}
 }
 
 message SkillInfo {
     string ExampleText = 1;
-    PosMappingInfo POSMapping = 2;
+    string GroupID = 2;
 }
 
 message RegisterRequest {
-    repeated SkillInfo ExampleInfo = 1; 
+    string SkillName = 1;
     string SkillID = 2;
+    repeated SkillInfo Examples = 3; 
+    string ForwardAddress = 4;
+    int32 ForwardType = 5;
 }
 
 message RegisterResponse {
