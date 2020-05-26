@@ -1,9 +1,9 @@
 import http from 'http';
 
-const handleReq = (req) => {
+const parseRequest = (req: any) => {
   return new Promise((res, rej) => {
-    const data = [];
-    req.on('data', (chunk) => {
+    const data: Array<string> = [];
+    req.on('data', (chunk: any) => {
       data.push(chunk);
     });
     req.on('end', () => {
@@ -18,15 +18,34 @@ const handleReq = (req) => {
 
       res();
     });
-    req.on('error', (err) => {
+    req.on('error', (err: string) => {
       rej(err);
     });
   });
 };
 
-const HTTPServer = async (port, handler) => {
+
+const handleErr = (
+  res: http.ServerResponse,
+) => (handlerErr: { message: string }) => {
+  const adjustedErr = { Error: handlerErr.message };
+
+  res.writeHead(500, { 'Content-Type': 'application/json' });
+  res.write(JSON.stringify(adjustedErr));
+  res.end();
+
+  return;
+};
+
+type Handler = (
+  resp: any,
+  handleErr: ( f: { message: string }) => void,
+  req: http.IncomingMessage,
+) => string
+
+const HTTPServer = async (port: number, handler: Handler) => {
   http.createServer(async (req, res) => {
-    const { resp, err } = await handleReq(req)
+    const { resp, err } = await parseRequest(req)
       .then((resp) => ({ resp, err: undefined }))
       .catch((err) => ({ resp: undefined, err }));
 
@@ -40,24 +59,15 @@ const HTTPServer = async (port, handler) => {
       return;
     }
 
-    const handleErr = (handlerErr) => {
-      const adjustedErr = { Error: handlerErr.message };
-
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.write(JSON.stringify(adjustedErr));
-      res.end();
-
-      return;
-    };
-
-    const skillResponse = await handler(resp, handleErr, req);
-    if(!skillResponse) {
+    const skillResponse = await handler(resp, handleErr(res), req);
+    if (!skillResponse) {
       return;
     }
 
     const jsonResp = JSON.stringify(skillResponse);
+
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.write(typeof jsonResp === "string" ? JSON.stringify(skillResponse) : '{ "Error": "invalid response type, check the return value and try again." }');
+    res.write(jsonResp);
     res.end();
   }).listen(port);
 };

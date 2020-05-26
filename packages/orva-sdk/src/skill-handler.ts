@@ -1,6 +1,10 @@
 import HTTPServer from './web-server';
-import GrpcSkillService from './grpc-skill-service';
+import {
+  registerSkill,
+  createClient,
+} from './internal/grpc-skill-service';
 import uuid from 'uuid';
+
 export default class SkillHandler {
   constructor({
     server = HTTPServer,
@@ -43,8 +47,8 @@ export default class SkillHandler {
       forwardAddress: this.hostAddress,
       forwardType: 0, // 0 -> http, no other types currently supported.
     });
-    
-    if(!resp.IsRegistered) {
+
+    if (!resp.IsRegistered) {
       throw Error('skill cannot be successfully registered')
     }
 
@@ -69,7 +73,7 @@ export default class SkillHandler {
       GroupID: id,
       ExampleText: x,
     })));
-    
+
     this.skills[id] = handlerCB;
   }
 }
