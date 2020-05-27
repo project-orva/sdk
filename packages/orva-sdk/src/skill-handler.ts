@@ -1,77 +1,119 @@
-import HTTPServer from './web-server';
+import HTTPServer, {
+  RequestHandler,
+  RequestError,
+} from './web-server';
 import {
-  registerSkill,
   createClient,
 } from './internal/grpc-skill-service';
-import uuid from 'uuid';
+import * as uuid from 'uuid';
+import http from 'http';
+
+interface SkillHandlerProps {
+  hostServiceUrl: string,
+  id: string,
+  name: string,
+  originAddress: string,
+}
+
+export interface ContextRequest {
+  subsetId: string,
+  userId: string,
+  message: string,
+  userAccessLevel: number,
+  deviceAccessLevel: number,
+}
+
+interface SkillResponse {
+  statement?: string,
+  graphicUrl?: string,
+  graphicType?: number,
+}
+
+type SkillRequest = (
+  resp: ContextRequest,
+  handleErr: RequestError,
+  req?: http.IncomingMessage) => SkillResponse
 
 export default class SkillHandler {
+  private skills: { [id: string]: SkillRequest } = {};
+  private server = HTTPServer;
+  private examples: Array<string> = []
+  private skillClient: any;
+  private id: string;
+  private name: string;
+  private originAddress: string;
+
   constructor({
-    server = HTTPServer,
-    skillHostURL,
-    skillID,
-  }) {
-    this.skills = [];
-    this.server = server;
-    this.examples = [];
+    hostServiceUrl,
+    id,
+    name,
+    originAddress,
+  }: SkillHandlerProps) {
+    this.skillClient = createClient({
+      serviceUrl: hostServiceUrl,
+    })
 
-    if (skillHostURL === undefined) {
-      throw Error("skill host url is required for usage");
-    }
-    this.skillClient = new GrpcSkillService(skillHostURL);
-
-    if (skillID === undefined) {
-      throw Error("skill id is required, to get skill id please register your skill")
-    }
-    this.skillID = skillID;
+    this.id = id;
+    this.name = name;
+    this.originAddress = originAddress;
   }
 
-  async _determineSkill(request, errHandler) {
+  private async determineSkill(
+    request: ContextRequest,
+    errHandler: RequestError,
+    httpRequest: http.IncomingMessage,
+  ) {
     if (!!this.skills[request.subsetId]) {
-      this.skills[request.subsetId](request, errHandler);
+      this.skills[request.subsetId](request, errHandler, httpRequest);
+      return
     }
     errHandler('subsetId map does not exist');
   }
 
-  async _serveSkillInformation() {
-    return {
-      skillId: this.skillId,
-      examples: this.examples,
+  private serveSkillInformation = () => ({
+    skillId: this.id,
+    examples: this.examples,
+  })
+
+  public async start(
+    port: number,
+    onStart: () => void = () => {},
+  ) {
+    try {
+      const resp = await this.skillClient.registerSkill({
+        skillName: this.name,
+        skillID: this.id,
+        forwardAddress: this.originAddress,
+        forwardType: 0, // 0 -> http, no other types currently supported.
+      });
+
+      if (!resp.IsRegistered) {
+        throw new Error('skill cannot be successfully registered')
+      }
+    } catch (err) {
+      throw new Error('failed to connect to host service')
     }
-  }
 
-  async start(port, onStart) {
-    const resp = await this.skillClient.registerCurrentInstance({
-      skillName: this.skillName,
-      skillID: this.skillId,
-      forwardAddress: this.hostAddress,
-      forwardType: 0, // 0 -> http, no other types currently supported.
-    });
-
-    if (!resp.IsRegistered) {
-      throw Error('skill cannot be successfully registered')
-    }
-
-    await onStart(); // ~
+    await onStart();
 
     this.server(port, async (...args) => {
       const { method } = args[2];
       if (method === 'GET') {
-        return this._serveSkillInformation()
+        return this.serveSkillInformation()
       } else if (method === 'POST') {
-        return this._determineSkill(...args)
+        return this.determineSkill(...args)
       }
 
-      args[1]({ message: 'method not supported' });
+      args[1]('method not supported');
     })
   }
 
-  async handleSkill(examples, handlerCB) {
+  async handleSkill(examples: any, handlerCB: SkillRequest) {
     const id = uuid.v4();
 
-    this.examples.concat(examples.map(x => ({
+    this.examples.concat(examples.map((example: string) => ({
       GroupID: id,
-      ExampleText: x,
+      ExampleText: example,
     })));
 
     this.skills[id] = handlerCB;

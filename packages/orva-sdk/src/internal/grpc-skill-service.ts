@@ -1,15 +1,13 @@
 import grpc from 'grpc';
-import protoloader from '@grpc/proto-loader';
+const protoloader = require('@grpc/proto-loader');
 
 export interface ClientConfig {
-  protoPath: string,
   serviceUrl: string,
-  serviceName: string,
 }
 
 export const createClient = (config: ClientConfig): any => {
   const protoDescriptor = grpc.loadPackageDefinition(protoloader.loadSync(
-    config.protoPath,
+    __dirname + '../../api/skill-service.proto',
     {
       keepCase: true,
       longs: String,
@@ -19,23 +17,10 @@ export const createClient = (config: ClientConfig): any => {
     },
   )) as { [id: string]: { [id: string]: any }};
 
-  const { serviceName } = config;
-  const GrpcInstance = protoDescriptor[serviceName][serviceName];
+  const GrpcInstance = protoDescriptor['grpcSkill']['grpcSkill'];
 
   return new GrpcInstance(
     config.serviceUrl,
     grpc.credentials.createInsecure(),
   );
 };
-
-
-export const registerSkill = async (
-  client: any,
-  args: any,
-) => await new Promise((
-  res,
-  rej,
-) => {
-  client.RegisterSkill(args,
-    (err: any, resp: any) => (err) ? rej(err) : res(resp))
-})

@@ -13,7 +13,7 @@ const parseRequest = (req: any) => {
           return;
         }
 
-        res(JSON.parse(data));
+        res(JSON.parse(data.join('')));
       }
 
       res();
@@ -27,8 +27,8 @@ const parseRequest = (req: any) => {
 
 const handleErr = (
   res: http.ServerResponse,
-) => (handlerErr: { message: string }) => {
-  const adjustedErr = { Error: handlerErr.message };
+) => (err: string) => {
+  const adjustedErr = { Error: err };
 
   res.writeHead(500, { 'Content-Type': 'application/json' });
   res.write(JSON.stringify(adjustedErr));
@@ -37,13 +37,15 @@ const handleErr = (
   return;
 };
 
-type Handler = (
-  resp: any,
-  handleErr: ( f: { message: string }) => void,
-  req: http.IncomingMessage,
-) => string
+export type RequestError = (err: string) => any;
 
-const HTTPServer = async (port: number, handler: Handler) => {
+export type RequestHandler = (
+  resp: any,
+  handleErr: RequestError,
+  req: http.IncomingMessage,
+) => any
+
+const HTTPServer = async (port: number, handler: RequestHandler) => {
   http.createServer(async (req, res) => {
     const { resp, err } = await parseRequest(req)
       .then((resp) => ({ resp, err: undefined }))
