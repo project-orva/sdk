@@ -1,9 +1,9 @@
 import HTTPServer, {
-  RequestHandler,
   RequestError,
 } from './web-server';
 import {
   createClient,
+  registerSkill,
 } from './internal/grpc-skill-service';
 import * as uuid from 'uuid';
 import http from 'http';
@@ -23,7 +23,7 @@ export interface ContextRequest {
   deviceAccessLevel: number,
 }
 
-interface SkillResponse {
+export interface SkillResponse {
   statement?: string,
   graphicUrl?: string,
   graphicType?: number,
@@ -51,7 +51,7 @@ export default class SkillHandler {
   }: SkillHandlerProps) {
     this.skillClient = createClient({
       serviceUrl: hostServiceUrl,
-    })
+    });
 
     this.id = id;
     this.name = name;
@@ -79,18 +79,21 @@ export default class SkillHandler {
     port: number,
     onStart: () => void = () => {},
   ) {
+
     try {
-      const resp = await this.skillClient.registerSkill({
-        skillName: this.name,
-        skillID: this.id,
-        forwardAddress: this.originAddress,
-        forwardType: 0, // 0 -> http, no other types currently supported.
-      });
+      const resp = await registerSkill(this.skillClient, {
+        SkillName: this.name,
+        SkillID: this.id,
+        ForwardAddress: this.originAddress,
+        ForwardType: 0, // 0 -> http, no other types currently supported.
+        Examples: this.examples,
+      }) as { IsRegistered: boolean };
 
       if (!resp.IsRegistered) {
         throw new Error('skill cannot be successfully registered')
       }
     } catch (err) {
+      console.log(err)
       throw new Error('failed to connect to host service')
     }
 
@@ -111,7 +114,7 @@ export default class SkillHandler {
   async handleSkill(examples: any, handlerCB: SkillRequest) {
     const id = uuid.v4();
 
-    this.examples.concat(examples.map((example: string) => ({
+    this.examples = this.examples.concat(examples.map((example: string) => ({
       GroupID: id,
       ExampleText: example,
     })));

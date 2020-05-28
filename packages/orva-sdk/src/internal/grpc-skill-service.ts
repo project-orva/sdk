@@ -15,7 +15,7 @@ export const createClient = (config: ClientConfig): any => {
       defaults: true,
       oneofs: true,
     },
-  )) as { [id: string]: { [id: string]: any }};
+  )) as { [id: string]: { [id: string]: any } };
 
   const GrpcInstance = protoDescriptor['grpcSkill']['grpcSkill'];
 
@@ -24,3 +24,14 @@ export const createClient = (config: ClientConfig): any => {
     grpc.credentials.createInsecure(),
   );
 };
+
+export const registerSkill = async (
+  client: any,
+  input: any,
+) => await new Promise((resolve, reject) => {
+  client['RegisterSkill'](input,
+  (err: any, res: any) => {
+    if (err) { reject(err); }
+    resolve(res);
+  });
+});
