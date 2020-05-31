@@ -1,13 +1,5 @@
-/**
- * Store entity to represent the stored data within the skill
- */
 class Store {
-  /**
-   * cons
-   */
-  constructor() {
-    this.store = {};
-  }
+  private store: { [id: string]: any } = {}
 
   /**
    * getItem fetches an item from the store
@@ -15,7 +7,7 @@ class Store {
    * @param {string} id of the object being searched for
    * @return {object} object (if found) from the store.
    */
-  getItem(user, id) {
+  public getItem(user: string, id: string) {
     return this.store[user][id];
   }
 
@@ -25,15 +17,15 @@ class Store {
    * @param {string} id id of the object being set
    * @param {object} item item assigned to the id in the store
    */
-  setItem(user, id, item) {
-    this.store[user] = {...this.store[user], [id]: item};
+  public setItem(user: string, id: string, item: any) {
+    this.store[user] = { ...this.store[user], [id]: item };
   }
 
   /**
    * resets the store
    */
   reset() {
-    this.store= {};
+    this.store = {};
   }
 }
 

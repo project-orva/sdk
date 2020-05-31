@@ -1,8 +1,8 @@
-import Store from '../lib/store';
+import Store from './index';
 
 describe('Store', () => {
   const ids = ['one', 'two', 'three'];
-  const objs = [{toast: 'one'}, {toast: 'f'}, {toast: 'fff'}];
+  const objs = [{ toast: 'one' }, { toast: 'f' }, { toast: 'fff' }];
   const user = 'guy';
 
   afterEach(() => {
