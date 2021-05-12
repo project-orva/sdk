@@ -14,7 +14,7 @@
   "author": "Guy A. Ross",
   "license": "ISC",
   "dependencies": {
-    "@grpc/grpc-js": "^0.6.2",
+    "@grpc/grpc-js": "^1.1.8",
     "@grpc/proto-loader": "^0.5.4",
     "@types/uuid": "^8.0.0",
     "grpc": "^1.23.3",
